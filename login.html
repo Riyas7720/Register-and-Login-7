@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <base target="_top">
+    <!-- Add the jQuery CDN -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <style>
+      <?!= include('style.css'); ?>
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <section id="formHolder">
+        <div class="row">
+          <!-- Brand Box -->
+          <div class="col-sm-6 brand">
+            <a href="#" class="logo">MR <span>.</span></a>
+            <div class="heading">
+              <h2>Google</h2>
+              <p>Your Right Choice</p>
+            </div>
+            <div class="success-msg">
+              <p>Great! You are one of our members now</p>
+              <a href="#" class="profile">Your Profile</a>
+            </div>
+          </div>
+
+          <!-- Form Box -->
+          <div class="col-sm-6 form">
+
+<!-- Login Form -->
+<div class="login form-peice switched">
+  <form id="loginForm" class="login-form" action="#" method="post">
+    <div class="form-group">
+      <label for="Username">Username</label>
+      <input type="text" name="Username" id="Username" required>
+    </div>
+    <div class="form-group">
+      <label for="loginPassword">Password</label>
+      <input type="password" name="loginPassword" id="loginPassword" required>
+    </div>
+    <div class="CTA">
+      <input type="submit" value="Login">
+      <a href="#" class="switch">Signup</a>
+    </div>
+    <div class="message-box"></div>
+  </form>
+</div>
+
+<!-- Signup Form -->
+<div class="signup form-peice">
+  <form id="signupForm" class="signup-form" action="#" method="post">
+    <div class="form-group">
+      <label for="signupFullName">Full Name</label>
+      <input type="text" name="fullname" id="signupFullName" class="name">
+      <span class="error"></span>
+    </div>
+    <div class="form-group">
+      <label for="signupEmail">Email Address</label>
+      <input type="email" name="email" id="signupEmail" class="email">
+      <span class="error"></span>
+    </div>
+    <div class="form-group">
+      <label for="signupUsername">Username</label>
+      <input type="text" name="username" id="signupUsername" class="name">
+      <span class="error"></span>
+    </div>
+    <div class="form-group">
+      <label for="signupPassword">Password</label>
+      <input type="password" name="password" id="signupPassword" class="pass">
+      <span class="error"></span>
+    </div>
+    <div class="CTA">
+      <input type="submit" value="Signup Now" id="submit">
+      <a href="#" class="switch">Login</a>
+    </div>
+    <div class="message-box"></div>
+  </form>
+</div>
+
+          </div>
+        </div>
+      </section>
+
+      <!-- Dashboard Section -->
+      <section id="dashboard" style="display: none;">
+        <h1>Welcome to the Dashboard</h1>
+        <p>This is your main dashboard where you can manage your activities.</p>
+        <button id="logoutBtn">Logout</button>
+      </section>
+
+      <footer>
+        <p>Form made by: <a>Mohammed Rayan</a></p>
+      </footer>
+    </div>
+
+    <script>
+      $(document).ready(function () {
+        'use strict';
+
+        // Label effect
+        $('input').focus(function () {
+          $(this).siblings('label').addClass('active');
+        }).blur(function () {
+          if ($(this).val().length === 0) {
+            $(this).siblings('label').removeClass('active');
+          }
+        });
+
+        // Form switch
+        $('a.switch').click(function (e) {
+          e.preventDefault();
+          $(this).toggleClass('active');
+          $(this).closest('.form-peice').toggleClass('switched').siblings('.form-peice').toggleClass('switched');
+        });
+
+        // Login Form Handler
+        $('#loginForm').on('submit', function (event) {
+          event.preventDefault();
+          const username = $('#Username').val();
+          const password = $('#loginPassword').val();
+
+          google.script.run.withSuccessHandler(loginResponse).processLogin(username, password);
+        });
+
+function loginResponse(response) {
+  const messageBox = $('#loginForm .message-box');
+  messageBox.empty(); // Clear any existing messages
+
+  if (response.success) {
+    messageBox.html('<p style="color: green;">Login Successful! Welcome!</p>');
+    $('#formHolder').hide();
+    $('#dashboard').show();
+    $('#loginForm')[0].reset();
+
+    // Auto-hide the message after 3 seconds
+    setTimeout(() => {
+      messageBox.empty();
+    }, 3000);
+  } else {
+    messageBox.html('<p style="color: red;">Login Failed: ' + response.message + '</p>');
+
+    // Auto-hide the message after 3 seconds
+    setTimeout(() => {
+      messageBox.empty();
+    }, 3000);
+  }
+}
+
+
+        // Signup Form Handler
+        $('#signupForm').on('submit', function (event) {
+          event.preventDefault();
+          const fullname = $('#signupFullName').val();
+          const email = $('#signupEmail').val();
+          const username = $('#signupUsername').val();
+          const password = $('#signupPassword').val();
+
+          google.script.run.withSuccessHandler(signupResponse).processSignup(fullname, email, username, password);
+        });
+
+function signupResponse(response) {
+  const messageBox = $('#signupForm .message-box');
+  messageBox.empty(); // Clear any existing messages
+
+  if (response.success) {
+    messageBox.html('<p style="color: green;">Signup Successful! Please log in now.</p>');
+    $('#signupForm')[0].reset();
+    $('#signupForm label').removeClass('active');
+    $('.signup').removeClass('switched');
+    $('.login').addClass('switched');
+
+    // Auto-hide the message after 3 seconds
+    setTimeout(() => {
+      messageBox.empty();
+    }, 3000);
+  } else {
+    messageBox.html('<p style="color: red;">Signup Failed: ' + response.message + '</p>');
+
+    // Auto-hide the message after 3 seconds
+    setTimeout(() => {
+      messageBox.empty();
+    }, 3000);
+  }
+}
+
+        // Logout functionality
+        $('#logoutBtn').click(function () {
+          $('#dashboard').hide();
+          $('#formHolder').show();
+        });
+      });
+    </script>
+  </body>
+</html>
